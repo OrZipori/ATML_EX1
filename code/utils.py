@@ -36,12 +36,46 @@ def transformToBinaryClasses(data, positiveClass):
 
     return newData
 
+def createOutputVectors(x, models):
+    outputVec = [] # for Hamming Distance
+    predVec = [] # for Loss Base Decoding
+
+    for model in models:
+        y_tag, pred = model.inference(x)
+        outputVec.append(y_tag)
+        predVec.append(pred)
+
+    return outputVec, predVec
+
 def HammingDistance(ecocMat, outputVec):
     rows = ecocMat.shape[0]
     distance = []
 
-    for r in rows:
-        pass
+    # iterate over rows - each row is a class
+    for r in range(rows):
+        # iterate over the columns of the ith row - each column is a classifier
+        val = 0
+        for i, s in enumerate(ecocMat[r]):
+            val += (1 - np.sign(s * outputVec[i])) / 2
+        distance.append(val)
+
+    return np.argmin(distance)
+
+def lossBaseDecoding(ecocMat, predVec):
+    rows = ecocMat.shape[0]
+    distance = []
+
+    # iterate over rows - each row is a class
+    for r in range(rows):
+        # iterate over the columns of the ith row - each column is a classifier
+        val = 0
+        for i, s in enumerate(ecocMat[r]):
+            tmp = 1 - (s * predVec[i]) 
+            val += np.max([tmp, 0])
+
+        distance.append(val)
+
+    return np.argmin(distance)  
 
 class SVM(object):
     def __init__(self, inputDim, eta, lambdaP, epochs):
@@ -76,6 +110,7 @@ class SVM(object):
 
     def inference(self, x):
         # since we use binary classifier
-        return np.sign(np.dot(x, self.W))[0][0]
+        pred = np.dot(x, self.W)
+        return np.sign(pred)[0][0], pred
 
     
