@@ -4,6 +4,8 @@ from sklearn.utils import shuffle
 
 # global variables
 eta = 0.1
+numOfClasses = 4
+inputDim = 784
 
 def fetchData():
     # read data
@@ -33,6 +35,13 @@ def transformToBinaryClasses(data, positiveClass):
             newData.append((x, -1))
 
     return newData
+
+def HammingDistance(ecocMat, outputVec):
+    rows = ecocMat.shape[0]
+    distance = []
+
+    for r in rows:
+        pass
 
 class SVM(object):
     def __init__(self, inputDim, eta, lambdaP, epochs):
