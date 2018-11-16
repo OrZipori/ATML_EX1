@@ -12,7 +12,7 @@ def main():
     inputDim = 784
 
     model = utils.SVM(inputDim, utils.eta, 1, 10)
-    model.train(trainset)
+    model.train(trainset, printLoss=True)
 
     # validate
     correct = 0 

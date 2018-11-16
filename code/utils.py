@@ -41,7 +41,7 @@ class SVM(object):
         self.lambdaP = lambdaP # regularization parameter
         self.epochs = epochs
     
-    def train(self, trainset):
+    def train(self, trainset, printLoss = False):
         # iterate over epochs
         for t in range(1, self.epochs + 1):
             np.random.shuffle(trainset)
@@ -61,7 +61,9 @@ class SVM(object):
                     self.W -= reg
                 loss += 1 - pred
             
-            print("Loss for #{} epoch is {}".format(t, loss))
+            # for sanity checks and testing
+            if (printLoss):
+                print("Loss for #{} epoch is {}".format(t, loss))
 
     def inference(self, x):
         # since we use binary classifier
