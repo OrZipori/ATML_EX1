@@ -17,12 +17,23 @@ def fetchData():
     # suffle examples
     x, y = shuffle(x, y, random_state=1)
 
+    # since we don't want to work with generator (python3 zip function) thus using list
     return list(zip(x, y))
+
+def loadTestData():
+    tset = np.loadtxt('./x_test.txt') 
+    labels = np.loadtxt('./y_test.txt')
+    testset = []
+
+    for x in tset:
+        testset.append(np.reshape(x, (1, 784)))
+    
+    return list(zip(testset, labels))
 
 '''
  since we have multiclass data but wish to train binray classifier
  we need to have a function that transforms classes to binray classification
- parameter: data is a list of pairs of x, y where y had value only from 2 classes
+ parameter: data is a list of pairs of x, y
             positiveClass is the class that will be mapped to +1 all other will be
                           mapped to -1
 '''
@@ -36,7 +47,7 @@ def transformToBinaryClasses(data, positiveClass):
 
     return newData
 
-def createOutputVectors(x, models):
+def createOutputVectors(x, models, distanceMetric="Hamming"):
     outputVec = [] # for Hamming Distance
     predVec = [] # for Loss Base Decoding
 
@@ -44,6 +55,11 @@ def createOutputVectors(x, models):
         y_tag, pred = model.inference(x)
         outputVec.append(y_tag)
         predVec.append(pred)
+
+    if (distanceMetric == "Hamming"):
+        return outputVec
+    else:
+        return predVec
 
     return outputVec, predVec
 
@@ -75,7 +91,31 @@ def lossBaseDecoding(ecocMat, predVec):
 
         distance.append(val)
 
-    return np.argmin(distance)  
+    return np.argmin(distance)
+
+def evaluation(dataset, distFunc, ecocMat, filePath, classifiers, distanceMetric="Hamming"):
+    correct = 0
+    incorrect = 0
+    predictions = []
+
+    for x, y in dataset:
+        vec = createOutputVectors(x, classifiers, distanceMetric)
+
+        y_tag = distFunc(ecocMat, vec)
+        if (y_tag == y):
+            correct += 1
+        else:
+            incorrect += 1
+        
+        predictions.append(str(y_tag))
+    
+    acc = 1. * correct / len(dataset)
+    print("Test {} : correct: {} incorrect: {} total: {}\n accuracy: {}".format(\
+        distanceMetric, correct, incorrect, len(dataset), acc))
+    
+    # save results
+    with open('./pred/' + filePath, 'w+') as f:
+        f.write("\n".join(predictions))
 
 class SVM(object):
     def __init__(self, inputDim, eta, lambdaP, epochs):
