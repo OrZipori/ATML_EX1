@@ -58,7 +58,7 @@ def main():
     utils.evaluation(testset
                      , utils.HammingDistance
                      , ecoc_matrix
-                     , 'test.allpairs.ham.pred'
+                     , 'test.random.ham.pred'
                      , classifiers
                      , distanceMetric="Hamming")
 
@@ -66,7 +66,7 @@ def main():
     utils.evaluation(testset
                      , utils.lossBaseDecoding
                      , ecoc_matrix
-                     , 'test.allpairs.loss.pred'
+                     , 'test.random.loss.pred'
                      , classifiers
                      , distanceMetric="LBD")
 
