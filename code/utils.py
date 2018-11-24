@@ -61,8 +61,6 @@ def createOutputVectors(x, models, distanceMetric="Hamming"):
     else:
         return predVec
 
-    return outputVec, predVec
-
 def HammingDistance(ecocMat, outputVec):
     rows = ecocMat.shape[0]
     distance = []
