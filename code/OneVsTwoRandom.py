@@ -17,7 +17,7 @@ def filter_data(data, classes_to_filter):
     return filtered_data
 
 
-def update_ecoc_matrix(ecoc_matrix, classifier_index, y0, y1, factor=0.4):
+def update_ecoc_matrix(ecoc_matrix, classifier_index, y0, y1):
     ecoc_matrix[y0, classifier_index] = 1
     # y1 is now a pair
     ecoc_matrix[y1[0], classifier_index] = -1
@@ -26,7 +26,7 @@ def update_ecoc_matrix(ecoc_matrix, classifier_index, y0, y1, factor=0.4):
         if i == y0 or i == y1[0] or i == y1[1]:
             continue
 
-        factor = factor * random.randint(-1, 1)
+        factor = random.randint(-1, 1)
         ecoc_matrix[i, classifier_index] = factor
 
 
@@ -59,13 +59,11 @@ def main():
             classifiers.append(model)
             print("finished with #{} model".format(pair_index))
 
-    print(ecoc_matrix)
-
     # Evaluate Test Data by Hamming Distance
     utils.evaluation(testset
                      , utils.HammingDistance
                      , ecoc_matrix
-                     , 'test.random.ham.pred'
+                     , 'test.random2.ham.pred'
                      , classifiers
                      , distanceMetric="Hamming")
 
@@ -73,7 +71,7 @@ def main():
     utils.evaluation(testset
                      , utils.lossBaseDecoding
                      , ecoc_matrix
-                     , 'test.random.loss.pred'
+                     , 'test.random2.loss.pred'
                      , classifiers
                      , distanceMetric="LBD")
 

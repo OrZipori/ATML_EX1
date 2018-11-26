@@ -27,11 +27,12 @@ def main():
     ecoc_matrix = np.zeros((k, columns), dtype=int)
     classifiers = []
     trainset = utils.fetchData()
+    devset = utils.loadDevData()
     print("total train set data len: {}".format(str(len(trainset))))
     testset = utils.loadTestData()
 
     lambda_p = 1
-    epoch_number = 15
+    epoch_number = 20
     pair_index = 0
 
     # Train All-Pair Classifiers
@@ -41,14 +42,16 @@ def main():
         pair_index = pair_index + 1
         filtered_data = filter_data(trainset, (y0, y1))
         print("pair relevant data: {}".format(str(len(filtered_data))))
-        binary_data = utils.transformToBinaryClasses(filtered_data, positiveClass=y0)
+        binary_data = utils.transformToBinaryClasses(filtered_data, positiveClass=[y0])
         model = utils.SVM(utils.inputDim, utils.eta, lambda_p, epoch_number)
         model.train(binary_data)
         classifiers.append(model)
         print("finished with #{} model".format(pair_index))
 
+    print(ecoc_matrix)
+
     # Evaluate Test Data by Hamming Distance
-    utils.evaluation(testset
+    utils.validate(devset
                      , utils.HammingDistance
                      , ecoc_matrix
                      , 'test.allpairs.ham.pred'
@@ -56,7 +59,23 @@ def main():
                      , distanceMetric="Hamming")
 
     # Evaluate Test Data by Loss Base Decoding
-    utils.evaluation(testset
+    utils.validate(devset
+                     , utils.lossBaseDecoding
+                     , ecoc_matrix
+                     , 'test.allpairs.loss.pred'
+                     , classifiers
+                     , distanceMetric="LBD")
+
+    # Evaluate Test Data by Hamming Distance
+    utils.evaluate(testset
+                     , utils.HammingDistance
+                     , ecoc_matrix
+                     , 'test.allpairs.ham.pred'
+                     , classifiers
+                     , distanceMetric="Hamming")
+
+    # Evaluate Test Data by Loss Base Decoding
+    utils.evaluate(testset
                      , utils.lossBaseDecoding
                      , ecoc_matrix
                      , 'test.allpairs.loss.pred'

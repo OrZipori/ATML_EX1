@@ -4,7 +4,7 @@ import numpy as np
 
 def main():
     data = [(x, y) for x,y in utils.fetchData() if y in [0, 2]]
-    binaryData = utils.transformToBinaryClasses(data, positiveClass=0)
+    binaryData = utils.transformToBinaryClasses(data, positiveClass=[0])
 
     divider = int(round(.85 * len(binaryData)))
     validation = binaryData[divider:]

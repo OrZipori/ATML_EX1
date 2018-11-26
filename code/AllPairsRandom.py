@@ -17,14 +17,14 @@ def filter_data(data, classes_to_filter):
     return filtered_data
 
 
-def update_ecoc_matrix(ecoc_matrix, classifier_index, y0, y1, factor=0.4):
+def update_ecoc_matrix(ecoc_matrix, classifier_index, y0, y1):
     ecoc_matrix[y0, classifier_index] = 1
     ecoc_matrix[y1, classifier_index] = -1
     for i in range(ecoc_matrix.shape[0]):
         if i == y0 or i == y1:
             continue
 
-        factor = factor * random.randint(-1, 1)
+        factor = random.randint(-1, 1)
         ecoc_matrix[i, classifier_index] = factor
 
 

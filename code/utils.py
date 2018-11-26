@@ -20,15 +20,24 @@ def fetchData():
     # since we don't want to work with generator (python3 zip function) thus using list
     return list(zip(x, y))
 
-def loadTestData():
-    tset = np.loadtxt('./x_test.txt') 
+def loadDevData():
+    dset = np.loadtxt('./x_test.txt') 
     labels = np.loadtxt('./y_test.txt')
+    devset = []
+
+    for x in dset:
+        devset.append(np.reshape(x, (1, 784)))
+    
+    return list(zip(devset, labels))
+
+def loadTestData():
+    tset = np.loadtxt('./x4pred.txt')
     testset = []
 
     for x in tset:
-        testset.append(np.reshape(x, (1, 784)))
+        testset.append(x.reshape((1, 784)))
     
-    return list(zip(testset, labels))
+    return testset
 
 '''
  since we have multiclass data but wish to train binray classifier
@@ -40,7 +49,7 @@ def loadTestData():
 def transformToBinaryClasses(data, positiveClass):
     newData = []
     for x, y in data:
-        if (y == positiveClass):
+        if (y in positiveClass):
             newData.append((x, 1))
         else:
             newData.append((x, -1))
@@ -91,10 +100,9 @@ def lossBaseDecoding(ecocMat, predVec):
 
     return np.argmin(distance)
 
-def evaluation(dataset, distFunc, ecocMat, filePath, classifiers, distanceMetric="Hamming"):
+def validate(dataset, distFunc, ecocMat, filePath, classifiers, distanceMetric="Hamming"):
     correct = 0
     incorrect = 0
-    predictions = []
 
     for x, y in dataset:
         vec = createOutputVectors(x, classifiers, distanceMetric)
@@ -104,16 +112,25 @@ def evaluation(dataset, distFunc, ecocMat, filePath, classifiers, distanceMetric
             correct += 1
         else:
             incorrect += 1
-        
-        predictions.append(str(y_tag))
     
     acc = 1. * correct / len(dataset)
-    print("Test {} : correct: {} incorrect: {} total: {}\n accuracy: {}".format(\
+    print("Validation {} : correct: {} incorrect: {} total: {}\n accuracy: {}".format(\
         distanceMetric, correct, incorrect, len(dataset), acc))
+
+def evaluate(dataset, distFunc, ecocMat, filePath, classifiers, distanceMetric="Hamming"):
+    predictions = []
+
+    for x in dataset:
+        vec = createOutputVectors(x, classifiers, distanceMetric)
+
+        y_tag = distFunc(ecocMat, vec)
+        predictions.append(str(y_tag))
     
     # save results
     with open('./pred/' + filePath, 'w+') as f:
         f.write("\n".join(predictions))
+
+    print("Test finish")
 
 class SVM(object):
     def __init__(self, inputDim, eta, lambdaP, epochs):
